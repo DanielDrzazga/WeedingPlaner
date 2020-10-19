@@ -6,6 +6,7 @@ import weddingplanner.admin.dto.request.UserRequestDTO;
 import weddingplanner.admin.repository.*;
 import weddingplanner.admin.service.UserService;
 import weddingplanner.application.component.CurrentUser;
+import weddingplanner.application.exception.ProcessException;
 import weddingplanner.application.models.*;
 
 /**
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserRequestDTO getCurrentUser() {
+    public UserRequestDTO getCurrentUser() throws Exception {
 
         //TODO orElseThrow()
         User user = userRepository.findById(currentUser.getId()).get();
@@ -53,6 +54,32 @@ public class UserServiceImpl implements UserService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .build();
+    }
+
+    @Override
+    public void updateUser(UserRequestDTO userRequestDTO) throws Exception{
+
+        //TODO orElseThrow()
+        User user = userRepository.findById(currentUser.getId()).get();
+
+        if (userRequestDTO.isPasswordChangeDetected()){
+            validatePasswordEquality(userRequestDTO,user);
+            //TODO password encryption
+            user.setPassword(userRequestDTO.getNewPassword());
+        }
+
+        user.setEmail(userRequestDTO.getEmail());
+        user.setFirstName(userRequestDTO.getFirstName());
+        user.setLastName(userRequestDTO.getLastName());
+
+        userRepository.save(user);
+    }
+
+    private void validatePasswordEquality(UserRequestDTO userRequestDTO, User user) throws Exception {
+        //TODO password encryption
+        if(!user.getPassword().equals(userRequestDTO.getOldPassword())){
+            throw new ProcessException("Old password doesn't match");
+        }
     }
 
 

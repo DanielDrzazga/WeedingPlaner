@@ -36,12 +36,16 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserRequestDTO> getCurrentUser(){
+    public ResponseEntity<UserRequestDTO> getCurrentUser() throws Exception {
 
         UserRequestDTO userRequestDTO = userService.getCurrentUser();
         return new ResponseEntity<>(userRequestDTO,HttpStatus.OK);
     }
 
+    @PutMapping
+    public ResponseEntity<Void> updateCurrentUser(@Valid @RequestBody UserRequestDTO userRequestDTO) throws Exception {
 
-
+        userService.updateUser(userRequestDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

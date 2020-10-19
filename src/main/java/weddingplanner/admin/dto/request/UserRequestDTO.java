@@ -26,4 +26,8 @@ public class UserRequestDTO {
     private String roleName;
 
 
+    public boolean isPasswordChangeDetected() {
+        return this.newPassword != null;
+    }
+
 }

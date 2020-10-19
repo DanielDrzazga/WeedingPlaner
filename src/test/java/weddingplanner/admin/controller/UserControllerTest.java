@@ -16,7 +16,7 @@ import weddingplanner.application.models.RoleEnum;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -84,10 +84,30 @@ class UserControllerTest {
                 .perform(get("/admin/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("firstName",is("Jan")))
-                .andExpect(jsonPath("lastName",is("Kowalski")))
+                .andExpect(jsonPath("firstName", is("Jan")))
+                .andExpect(jsonPath("lastName", is("Kowalski")))
                 .andExpect(jsonPath("email", is("JanKowalski@polska.pl")));
     }
 
+    @Test
+    public void updateCurrentUserShouldUpdateUser() throws Exception {
+
+        UserRequestDTO userRequestDTO = UserRequestDTO.builder()
+                .newPassword("password1")
+                .firstName("Jan")
+                .lastName("Kowalski")
+                .email("JanKowalski@polska.pl")
+                .roleName(RoleEnum.ROLE_USER.getValue())
+                .build();
+
+        doNothing().when(userService).updateUser(userRequestDTO);
+
+        this.mockMvc
+                .perform(put("/admin/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRequestDTO)))
+                .andExpect(status().isOk());
+
+    }
 
 }
