@@ -35,4 +35,13 @@ public class UserController {
         return new ResponseEntity<>(httpHeaders,HttpStatus.CREATED);
     }
 
+    @GetMapping
+    public ResponseEntity<UserRequestDTO> getCurrentUser(){
+
+        UserRequestDTO userRequestDTO = userService.getCurrentUser();
+        return new ResponseEntity<>(userRequestDTO,HttpStatus.OK);
+    }
+
+
+
 }

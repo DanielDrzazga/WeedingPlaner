@@ -17,7 +17,7 @@ import weddingplanner.application.models.RoleEnum;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -65,6 +65,28 @@ class UserControllerTest {
         assertThat(argumentCaptor.getValue().getNewPassword(), is("password1"));
         assertThat(argumentCaptor.getValue().getRoleName(), is("USER"));
 
+    }
+
+    @Test
+    public void getCurrentUserShouldReturnCurrentUser() throws Exception {
+
+        UserRequestDTO userRequestDTO = UserRequestDTO.builder()
+                .newPassword("password1")
+                .firstName("Jan")
+                .lastName("Kowalski")
+                .email("JanKowalski@polska.pl")
+                .roleName(RoleEnum.ROLE_USER.getValue())
+                .build();
+
+        when(userService.getCurrentUser()).thenReturn(userRequestDTO);
+
+        this.mockMvc
+                .perform(get("/admin/users"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("firstName",is("Jan")))
+                .andExpect(jsonPath("lastName",is("Kowalski")))
+                .andExpect(jsonPath("email", is("JanKowalski@polska.pl")));
     }
 
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import weddingplanner.admin.dto.request.UserRequestDTO;
 import weddingplanner.admin.repository.*;
 import weddingplanner.admin.service.UserService;
+import weddingplanner.application.component.CurrentUser;
 import weddingplanner.application.models.*;
 
 /**
@@ -17,6 +18,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+
+    private CurrentUser currentUser;
 
     @Override
     public Long saveUser(UserRequestDTO userRequestDTO) throws Exception {
@@ -36,6 +39,20 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return user.getId();
+    }
+
+    @Override
+    public UserRequestDTO getCurrentUser() {
+
+        //TODO orElseThrow()
+        User user = userRepository.findById(currentUser.getId()).get();
+
+        return UserRequestDTO.builder()
+                .newPassword(user.getPassword())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .build();
     }
 
 

@@ -9,4 +9,6 @@ import weddingplanner.admin.dto.request.UserRequestDTO;
 
 public interface UserService {
     Long saveUser(UserRequestDTO userRequestDTO) throws Exception;
+
+    UserRequestDTO getCurrentUser();
 }
