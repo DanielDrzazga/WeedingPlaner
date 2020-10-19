@@ -11,6 +11,7 @@ import java.util.*;
 
 @Getter
 @Setter
+@Builder
 @ToString
 @Entity
 @Table(name = "users")
