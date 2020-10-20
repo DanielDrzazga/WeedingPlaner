@@ -9,6 +9,8 @@ import weddingplanner.application.component.*;
 import weddingplanner.application.exception.ProcessException;
 import weddingplanner.application.models.*;
 
+import java.util.function.Supplier;
+
 /**
  * Create by Daniel Drzazga on 16.10.2020
  **/
@@ -45,8 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRequestDTO getCurrentUser() throws Exception {
 
-        //TODO orElseThrow()
-        User user = userRepository.findById(currentUser.getId()).get();
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(userNotFound());
 
         return UserRequestDTO.builder()
                 .newPassword(user.getPassword())
@@ -57,13 +58,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(UserRequestDTO userRequestDTO) throws Exception{
+    public void updateUser(UserRequestDTO userRequestDTO) throws Exception {
 
-        //TODO orElseThrow()
-        User user = userRepository.findById(currentUser.getId()).get();
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(userNotFound());
 
-        if (userRequestDTO.isPasswordChangeDetected()){
-            validatePasswordEquality(userRequestDTO,user);
+        if (userRequestDTO.isPasswordChangeDetected()) {
+            validatePasswordEquality(userRequestDTO, user);
             user.setPassword(md5Encoder.getMD5Hash(userRequestDTO.getNewPassword()));
         }
 
@@ -75,10 +75,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validatePasswordEquality(UserRequestDTO userRequestDTO, User user) throws Exception {
-        if(!user.getPassword().equals(md5Encoder.getMD5Hash(userRequestDTO.getOldPassword()))){
+        if (!user.getPassword().equals(md5Encoder.getMD5Hash(userRequestDTO.getOldPassword()))) {
             throw new ProcessException("Old password doesn't match");
         }
     }
 
+    private Supplier<? extends RuntimeException> userNotFound() {
+        return () -> new RuntimeException("User not found");
+    }
 
 }
