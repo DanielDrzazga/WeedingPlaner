@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import weddingplanner.admin.dto.request.UserRequestDTO;
 import weddingplanner.admin.repository.*;
 import weddingplanner.admin.service.UserService;
-import weddingplanner.application.component.CurrentUser;
+import weddingplanner.application.component.*;
 import weddingplanner.application.exception.ProcessException;
 import weddingplanner.application.models.*;
 
@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final MD5Encoder md5Encoder;
 
     private CurrentUser currentUser;
 
@@ -26,8 +27,7 @@ public class UserServiceImpl implements UserService {
     public Long saveUser(UserRequestDTO userRequestDTO) throws Exception {
 
         User user = User.builder()
-                //TODO password encryption
-                .password(userRequestDTO.getNewPassword())
+                .password(md5Encoder.getMD5Hash(userRequestDTO.getNewPassword()))
                 .firstName(userRequestDTO.getFirstName())
                 .lastName(userRequestDTO.getLastName())
                 .email(userRequestDTO.getEmail())
@@ -64,8 +64,7 @@ public class UserServiceImpl implements UserService {
 
         if (userRequestDTO.isPasswordChangeDetected()){
             validatePasswordEquality(userRequestDTO,user);
-            //TODO password encryption
-            user.setPassword(userRequestDTO.getNewPassword());
+            user.setPassword(md5Encoder.getMD5Hash(userRequestDTO.getNewPassword()));
         }
 
         user.setEmail(userRequestDTO.getEmail());
@@ -76,8 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validatePasswordEquality(UserRequestDTO userRequestDTO, User user) throws Exception {
-        //TODO password encryption
-        if(!user.getPassword().equals(userRequestDTO.getOldPassword())){
+        if(!user.getPassword().equals(md5Encoder.getMD5Hash(userRequestDTO.getOldPassword()))){
             throw new ProcessException("Old password doesn't match");
         }
     }
