@@ -9,6 +9,7 @@ import weddingplanner.application.component.*;
 import weddingplanner.application.exception.ProcessException;
 import weddingplanner.application.models.*;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 /**
@@ -28,16 +29,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long saveUser(UserRequestDTO userRequestDTO) throws Exception {
 
+        Role role = roleRepository.findByRoleName(RoleEnum.ROLE_USER.getValue());
+
         User user = User.builder()
                 .password(md5Encoder.getMD5Hash(userRequestDTO.getNewPassword()))
                 .firstName(userRequestDTO.getFirstName())
                 .lastName(userRequestDTO.getLastName())
                 .email(userRequestDTO.getEmail())
+                .roles(Arrays.asList(role))
                 .active(true)
                 .build();
-
-        Role role = roleRepository.findByRoleName(RoleEnum.ROLE_USER.getValue());
-        user.getRoles().add(role);
 
         userRepository.save(user);
 
