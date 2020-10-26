@@ -9,7 +9,7 @@ import weddingplanner.application.component.*;
 import weddingplanner.application.exception.ProcessException;
 import weddingplanner.application.models.*;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -50,6 +50,10 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(currentUser.getId()).orElseThrow(userNotFound());
 
+        List<Role> roles = user.getRoles();
+        String roleName = roles.stream().filter(this::hasBasicRole).map(roleEntry -> roleEntry.getRoleName())
+                .findFirst().get();
+
         return UserRequestDTO.builder()
                 .newPassword(user.getPassword())
                 .firstName(user.getFirstName())
@@ -85,4 +89,12 @@ public class UserServiceImpl implements UserService {
         return () -> new RuntimeException("User not found");
     }
 
+    private boolean hasBasicRole(Role role) {
+
+        boolean basicRole = Arrays.stream(
+                new String[] { RoleEnum.ROLE_ADMIN.getValue(), RoleEnum.ROLE_USER.getValue() })
+                .anyMatch(role.getRoleName()::equalsIgnoreCase);
+
+        return basicRole;
+    }
 }
