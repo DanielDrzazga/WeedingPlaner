@@ -1,5 +1,6 @@
 package weddingplanner.login.component.security.config;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import weddingplanner.application.component.MD5Encoder;
+import weddingplanner.login.component.security.*;
 
 import javax.sql.DataSource;
 
@@ -16,15 +18,14 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private AuthSuccessHandler authSuccessHandler;
+    private AuthFailureHandler authFailureHandler;
 
     private DataSource dataSource;
     private MD5Encoder md5Encoder;
-
-    public SecurityConfig(DataSource dataSource) {
-        this.md5Encoder = new MD5Encoder();
-        this.dataSource = dataSource;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -39,6 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authenticated()
                 .and()
                     .formLogin()
+                    .successHandler(authSuccessHandler)
+                    .failureHandler(authFailureHandler)
                     .usernameParameter("email")
                     .passwordParameter("password")
                     .permitAll()
